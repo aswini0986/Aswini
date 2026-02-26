@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aswini S · minimal icon nav</title>
+  <style>
+    /* =========================================================
+       3D flip skills + minimal icon navbar
+       Icons at top right, fixed, with hover effects
+    ========================================================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Inter', 'Helvetica', 'Arial', sans-serif;
+      color: #2a2738;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 5rem 2rem 3rem 2rem;
+      line-height: 1.5;
+      position: relative;
+      background: #e8e2d4;
+    }
+
+    /* ---------- BACKGROUND VIDEOS (two themes) ---------- */
+    .bg-video-light,
+    .bg-video-dark {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: 0;
+      opacity: 0.2;
+      pointer-events: none;
+      filter: grayscale(0.3) contrast(1.1);
+      display: none; /* initially hidden, shown by JS */
+    }
+
+    .doodle-bg {
+      position: fixed;
+      top: -5%;
+      left: -5%;
+      width: 110%;
+      height: 110%;
+      background-image: url('doodle.jpeg');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      filter: grayscale(1) contrast(1.2) brightness(0.95);
+      opacity: 0.35;
+      pointer-events: none;
+      z-index: 1;
+      animation: floatDoodle 26s infinite alternate ease-in-out;
+      mix-blend-mode: multiply;
+    }
+
+    @keyframes floatDoodle {
+      0% { transform: translate(0, 0) scale(1); }
+      100% { transform: translate(-1.2%, -1.2%) scale(1.01); }
+    }
+
+    .paper-texture {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        repeating-linear-gradient(45deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 2px, transparent 2px, transparent 8px),
+        repeating-linear-gradient(135deg, rgba(0,0,0,0.02) 0px, rgba(0,0,0,0.02) 2px, transparent 2px, transparent 8px),
+        radial-gradient(circle at 20% 30%, rgba(0,0,0,0.015) 2px, transparent 2px),
+        radial-gradient(circle at 80% 70%, rgba(0,0,0,0.015) 1px, transparent 2px);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    /* ---------- MINIMAL ICON NAVBAR (fixed top right) ---------- */
+    .icon-nav {
+      position: fixed;
+      top: 1rem;
+      right: 2rem;
+      z-index: 100;
+      background: rgba(255, 255, 245, 0.3);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 50px;
+      padding: 0.6rem 1.2rem;
+      display: flex;
+      gap: 1.2rem;
+      border: 1px solid rgba(0,0,0,0.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    }
+
+    .icon-nav a {
+      color: #2a2738;
+      font-size: 1.5rem;
+      transition: color 0.2s, transform 0.2s;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .icon-nav a:hover {
+      color: #B5A8D5;
+      transform: scale(1.1);
+    }
+
+    /* ---------- HERO ---------- */
+    .hero {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto 3rem auto;
+      text-align: center;
+      background: transparent;
+      border: 2px solid #000000;        /* black border */
+      border-radius: 30px;               /* curved corners */
+      padding: 3rem 2rem;
+      position: relative;
+      z-index: 20;
+      transition: border-color 0.2s ease;
+    }
+
+    .hero:hover {
+      border-color: #B5A8D5;             /* lavender on hover */
+    }
+
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 4rem;
+      font-weight: 700;
+      color: #2a2738;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+      text-shadow: 0 2px 8px rgba(255,255,240,0.8);
+    }
+
+    .hero .tagline {
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #4a4058;
+      margin-bottom: 1rem;
+      text-shadow: 0 1px 6px rgba(255,255,240,0.8);
+    }
+
+    .hero .description {
+      max-width: 700px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+      color: #3d354a;
+      text-shadow: 0 1px 4px rgba(255,255,240,0.8);
+    }
+
+    /* ---------- FLOATING SECTIONS ---------- */
+    .sections-container {
+      width: 100%;
+      max-width: 1000px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      position: relative;
+      z-index: 20;
+    }
+
+    .floating-card {
+      background: transparent;
+      border: 2px solid #000000;        /* black border */
+      border-radius: 30px;               /* curved corners */
+      padding: 1.5rem 2rem;
+      transition: border-color 0.2s ease;
+    }
+
+    .floating-card:hover {
+      border-color: #B5A8D5;             /* lavender on hover */
+    }
+
+    h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 600;
+      color: #2a2738;
+      margin: 0 0 1rem 0;
+      border-left: 6px solid #8a7a70;    /* subtle accent */
+      padding-left: 1.2rem;
+      text-shadow: 0 2px 6px rgba(255,255,240,0.8);
+    }
+
+    .about-text {
+      font-size: 1.1rem;
+      text-shadow: 0 1px 4px rgba(255,255,240,0.8);
+    }
+
+    .education-item {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 1rem;
+      text-shadow: 0 1px 4px rgba(255,255,240,0.8);
+    }
+    .edu-score {
+      font-weight: 500;
+      color: #5b5b5b;
+    }
+
+    /* ---------- 3D FLIP CARDS ---------- */
+    .skills-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin: 0.8rem 0;
+    }
+
+    .flip-card {
+      background: transparent;
+      width: 130px;
+      height: 110px;
+      perspective: 2000px;
+      flex: 0 0 auto;
+    }
+
+    .flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.3, 1);
+      transform-style: preserve-3d;
+    }
+
+    .flip-card:hover .flip-inner {
+      transform: rotateY(180deg);
+    }
+
+    .flip-front, .flip-back {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      backface-visibility: hidden;
+      padding: 0.4rem 0.2rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid rgba(42, 39, 56, 0.2);
+      background: rgba(255, 255, 240, 0.05);
+      font-size: 0.85rem;
+      text-align: center;
+      color: #2a2738;
+      text-shadow: 0 1px 4px rgba(255,255,240,0.8);
+    }
+
+    .flip-back {
+      transform: rotateY(180deg);
+      border-color: rgba(106, 90, 80, 0.3);
+    }
+
+    .flip-back ul {
+      list-style: none;
+      width: 100%;
+      padding: 0;
+    }
+
+    .flip-back li {
+      margin: 0.2rem 0.3rem;
+      padding: 0.2rem;
+      font-size: 0.8rem;
+    }
+
+    .skill-icon {
+      font-size: 1.8rem;
+      margin-bottom: 0.2rem;
+      filter: drop-shadow(0 2px 4px rgba(255,255,240,0.6));
+    }
+
+    /* ---------- LISTS ---------- */
+    .achievements-list, .leadership-list, .cert-list {
+      list-style: none;
+    }
+
+    .achievements-list li, .leadership-list li, .cert-list li {
+      margin-bottom: 0.8rem;
+      font-size: 0.95rem;
+      text-shadow: 0 1px 4px rgba(255,255,240,0.8);
+    }
+
+    /* ---------- CONTACT ---------- */
+    .contact-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .contact-info .label {
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      color: #6FA3A8;
+      letter-spacing: 1px;
+      text-shadow: 0 1px 3px rgba(255,255,240,0.6);
+    }
+
+    .contact-info a {
+      color: #2a2738;
+      text-decoration: none;
+      border-bottom: 1px dotted #b0a8c0;
+      font-weight: 500;
+      text-shadow: 0 1px 4px rgba(255,255,240,0.8);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 1.8rem;
+    }
+
+    .social-links a {
+      font-size: 1.3rem;
+      color: #2a2738;
+      text-decoration: none;
+      border-bottom: 2px dotted transparent;
+      transition: color 0.2s, border-bottom 0.2s;
+      text-shadow: 0 1px 4px rgba(255,255,240,0.8);
+    }
+
+    .social-links a:hover {
+      color: #6FA3A8;
+      border-bottom-color: #6FA3A8;
+    }
+
+    /* floating print button */
+    .print-btn {
+      background: transparent;
+      border: none;
+      color: #2a2738;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      padding: 0.5rem 1.5rem;
+      cursor: pointer;
+      transition: 0.2s;
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 40;
+      text-shadow: 0 2px 6px rgba(255,255,240,0.8);
+    }
+
+    .print-btn:hover {
+      color: #6FA3A8;
+    }
+
+    /* Theme toggle button */
+    .theme-toggle-btn {
+      position: fixed;
+      bottom: 2rem;
+      left: 2rem;
+      z-index: 200;
+      background: white;
+      border: 1px solid black;
+      border-radius: 40px;
+      padding: 0.5rem 1.2rem;
+      font-size: 1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transition: 0.2s;
+    }
+    .theme-toggle-btn:hover {
+      background: #F0E6FF;
+      border-color: #B5A8D5;
+    }
+    @media (max-width: 700px) {
+      body { padding: 5rem 1rem 2rem 1rem; }
+      .hero h1 { font-size: 3rem; }
+      .hero .tagline { font-size: 1.2rem; }
+      .icon-nav {
+        right: 1rem;
+        padding: 0.4rem 1rem;
+        gap: 0.8rem;
+      }
+      .icon-nav a { font-size: 1.2rem; }
+      .print-btn { bottom: 1rem; right: 1rem; }
+      .theme-toggle-btn {
+        bottom: 1rem;
+        left: 1rem;
+        padding: 0.3rem 1rem;
+      }
+      .hero, .floating-card { padding: 1.5rem; }
+    }
+
+    @media print {
+      .bg-video-light, .bg-video-dark, .doodle-bg, .paper-texture, .icon-nav, .print-btn, .theme-toggle-btn { display: none; }
+      body { background: white; padding: 0; }
+    }
+  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+  <!-- BACKGROUND VIDEOS: one for light theme, one for dark theme -->
+  <video class="bg-video-light" autoplay muted loop playsinline>
+    <source src="199001-909564581_medium (1).mp4" type="video/mp4">
+    <!-- light theme video -->
+  </video>
+  <video class="bg-video-dark" autoplay muted loop playsinline>
+    <source src="143752-784138189_medium.mp4" type="video/mp4">
+    <!-- dark theme video -->
+  </video>
+
+  <!-- doodle & paper texture -->
+  <div class="doodle-bg"></div>
+  <div class="paper-texture"></div>
+
+  <!-- MINIMAL ICON NAVIGATION (fixed top right) -->
+  <nav class="icon-nav">
+    <a href="#hero" aria-label="Home"><i class="fas fa-home"></i></a>
+    <a href="#about" aria-label="About"><i class="fas fa-user"></i></a>
+    <a href="#education" aria-label="Education"><i class="fas fa-graduation-cap"></i></a>
+    <a href="#skills" aria-label="Skills"><i class="fas fa-code"></i></a>
+    <a href="#achievements" aria-label="Achievements"><i class="fas fa-trophy"></i></a>
+    <a href="#leadership" aria-label="Leadership"><i class="fas fa-users"></i></a>
+    <a href="#certifications" aria-label="Certifications"><i class="fas fa-certificate"></i></a>
+    <a href="#contact" aria-label="Contact"><i class="fas fa-envelope"></i></a>
+  </nav>
+
+  <!-- HERO SECTION (Home) -->
+  <div class="hero" id="hero">
+    <h1>Hi, I'm Aswini S.</h1>
+    <div class="tagline">Computer Science student & aspiring web developer</div>
+    <div class="description">
+      I'm currently based in Kallakurichi, Tamil Nadu, studying at Government College of Engineering, Salem. I design responsive websites and enjoy solving real-world problems through code.
+    </div>
+  </div>
+
+  <!-- FLOATING SECTIONS -->
+  <div class="sections-container">
+    <section class="floating-card" id="about">
+      <h2>About</h2>
+      <div class="about-text">
+        Aspiring Computer Science student seeking an entry-level role to actively apply web development skills and learn modern software technologies in a real-world environment.
+      </div>
+    </section>
+
+    <section class="floating-card" id="education">
+      <h2>Education</h2>
+      <div class="education-item">
+        <span class="edu-left"><strong>AKT Academy Matric Hr Sec School, Kallakurichi</strong> — HSC</span>
+        <span class="edu-score">89%</span>
+      </div>
+      <div class="education-item">
+        <span class="edu-left"><strong>Government College of Engineering, Salem</strong> — B.E. Computer Science and Engineering</span>
+        <span class="edu-score">CGPA: 7.79 (up to 5th sem)</span>
+      </div>
+    </section>
+
+    <section class="floating-card" id="skills">
+      <h2>Skills</h2>
+      <div class="skills-grid">
+        <div class="flip-card">
+          <div class="flip-inner">
+            <div class="flip-front"><span class="skill-icon">⚙️</span>PROG</div>
+            <div class="flip-back"><ul><li>C++</li><li>Java</li><li>SQL</li></ul></div>
+          </div>
+        </div>
+        <div class="flip-card">
+          <div class="flip-inner">
+            <div class="flip-front"><span class="skill-icon">🌐</span>WEB</div>
+            <div class="flip-back"><ul><li>HTML</li><li>CSS</li></ul></div>
+          </div>
+        </div>
+        <div class="flip-card">
+          <div class="flip-inner">
+            <div class="flip-front"><span class="skill-icon">📁</span>TOOLS</div>
+            <div class="flip-back"><ul><li>Word</li><li>Excel</li><li>PPT</li></ul></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="floating-card" id="achievements">
+      <h2>Achievements & Awards</h2>
+      <ul class="achievements-list">
+        <li>Participated in Smart India Hackathon, collaborated in a team to develop innovative solutions.</li>
+        <li>Participated in World Record for the Largest Display of Origami Doves for Peace promoting global harmony.</li>
+        <li>Contributed fingerprint impressions to Constitution of India initiative supporting Democracy awareness.</li>
+      </ul>
+    </section>
+
+    <section class="floating-card" id="leadership">
+      <h2>Leadership</h2>
+      <ul class="leadership-list">
+        <li>NSS In-charge – Managed volunteer coordination, event planning, and NSS activities.</li>
+      </ul>
+    </section>
+
+    <section class="floating-card" id="certifications">
+      <h2>Certifications</h2>
+      <ul class="cert-list">
+        <li>Oracle Data Science Certification – Naan Mudhalvan</li>
+        <li>Google Cybersecurity Certification – Naan Mudhalvan</li>
+      </ul>
+    </section>
+
+    <section class="floating-card" id="contact">
+      <h2>Contact</h2>
+      <div class="contact-panel">
+        <div class="contact-info">
+          <span class="label">Email</span>
+          <a href="mailto:aswiniselvakumar86@gmail.com">aswiniselvakumar86@gmail.com</a>
+          <span class="label" style="margin-top:0.8rem;">Location</span>
+          <span>Kallakurichi, Tamil Nadu</span>
+        </div>
+        <div class="social-links">
+          <a href="https://www.linkedin.com/in/aswini1234" target="_blank"><i class="fab fa-linkedin-in"></i></a>
+          <a href="#"><i class="fab fa-facebook-f"></i></a>
+          <a href="#"><i class="fab fa-twitter"></i></a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- floating print button -->
+  <button class="print-btn" onclick="window.print()"><i class="fas fa-download"></i> Resume</button>
+
+  <!-- Manual theme toggle button -->
+  <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle theme video">
+    <i class="fas fa-sun"></i> / <i class="fas fa-moon"></i>
+  </button>
+
+  <script>
+    (function() {
+      const lightVideo = document.querySelector('.bg-video-light');
+      const darkVideo = document.querySelector('.bg-video-dark');
+      const toggleBtn = document.getElementById('theme-toggle');
+
+      // Check localStorage for a saved override
+      let savedTheme = localStorage.getItem('video-theme'); // 'light' or 'dark'
+
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          darkVideo.style.display = 'block';
+          lightVideo.style.display = 'none';
+          // Ensure videos play/pause appropriately
+          darkVideo.play().catch(e => console.log('Dark video play error:', e));
+          lightVideo.pause();
+        } else {
+          lightVideo.style.display = 'block';
+          darkVideo.style.display = 'none';
+          lightVideo.play().catch(e => console.log('Light video play error:', e));
+          darkVideo.pause();
+        }
+      }
+
+      function setVideoBasedOnSystem() {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(prefersDark ? 'dark' : 'light');
+        localStorage.removeItem('video-theme'); // clear override when following system
+      }
+
+      // If there's a saved override, use it; otherwise follow system
+      if (savedTheme) {
+        applyTheme(savedTheme);
+      } else {
+        setVideoBasedOnSystem();
+      }
+
+      // Listen for system changes only if no override is active
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+        if (!localStorage.getItem('video-theme')) {
+          applyTheme(e.matches ? 'dark' : 'light');
+        }
+      });
+
+      // Toggle button click: cycle light -> dark -> system
+      toggleBtn.addEventListener('click', () => {
+        const currentOverride = localStorage.getItem('video-theme');
+        if (!currentOverride) {
+          // No override -> switch to dark
+          localStorage.setItem('video-theme', 'dark');
+          applyTheme('dark');
+        } else if (currentOverride === 'dark') {
+          // Dark override -> switch to light
+          localStorage.setItem('video-theme', 'light');
+          applyTheme('light');
+        } else {
+          // Light override -> go back to system
+          localStorage.removeItem('video-theme');
+          setVideoBasedOnSystem();
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
